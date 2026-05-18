@@ -14,3 +14,5 @@ crash.*.log
 
 # Ignore AWS CLI credentials if accidentally copied here
 .aws/
+
+.pem

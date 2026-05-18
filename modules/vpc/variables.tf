@@ -1,24 +1,13 @@
-variable "vpc_cidr" {
-  description = "The CIDR block for the VPC"
+variable "vpc_cidr" {}
+variable "project_name" {}
+variable "environment" {}
+
+variable "region" {
   type        = string
+  description = "The AWS region to deploy resources into"
 }
 
-variable "vpc_name" {
-  description = "The name of the VPC"
-  type        = string
-}
-
-variable "public_subnet_cidrs" {
-  description = "List of public subnet CIDR blocks"
+variable "availability_zones" {
   type        = list(string)
-}
-
-variable "private_subnet_cidrs" {
-  description = "List of private subnet CIDR blocks"
-  type        = list(string)
-}
-
-variable "azs" {
-  description = "List of Availability Zones to use"
-  type        = list(string)
+  description = "List of AZs to use for subnets"
 }
