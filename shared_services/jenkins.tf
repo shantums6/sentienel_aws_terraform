@@ -53,6 +53,9 @@ resource "aws_instance" "jenkins_master" {
   # IMPORTANT: If you have an SSH Key Pair in AWS, uncomment the line below and add the name.
   key_name = "sentinel-jenkins-key"
 
+  # Grab the profile name from the module output
+  iam_instance_profile = module.jenkins_iam_role.instance_profile_name
+
   tags = {
     Name = "sentinel-${var.environment}-jenkins-master"
   }
@@ -80,3 +83,15 @@ output "jenkins_public_ip" {
   value       = aws_instance.jenkins_master.public_ip
 }
 
+
+module "jenkins_iam_role" {
+  source = "../modules/iam"
+
+  role_name    = "sentinel-${var.environment}-jenkins-role"
+  profile_name = "sentinel-${var.environment}-jenkins-instance-profile"
+
+  # You can add as many policies to this list as you want in the future
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AdministratorAccess"
+  ]
+}
