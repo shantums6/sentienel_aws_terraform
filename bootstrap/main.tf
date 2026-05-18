@@ -1,37 +1,50 @@
-resource "aws_servicecatalog_provisioned_product" "prod_account" {
-  name = "App-Prod-Account"
+# 1. The S3 Bucket for State Storage
+resource "aws_s3_bucket" "terraform_state" {
+  bucket        = "sentinel-insure-tf-state-svh-0504"
+  force_destroy = true # <-- CHANGE THIS to be unique
 
-  # Using these IDs directly is the most reliable way to fix your error
-  product_id               = "prod-3zjmn2kytkkuu"
-  provisioning_artifact_id = "pa-7e2ehdqfozg54"
-
-  provisioning_parameters {
-    key   = "AccountEmail"
-    value = "aws-prod060824@proton.me" # Ensure this is a unique email you haven't used yet
+  # Best practice: Prevent accidental deletion of this bucket
+  lifecycle {
+    prevent_destroy = false
   }
+}
 
-  provisioning_parameters {
-    key   = "AccountName"
-    value = "App-Prod"
+# 2. Enable Versioning (Requirement for State History)
+resource "aws_s3_bucket_versioning" "enabled" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  provisioning_parameters {
-    key   = "ManagedOrganizationalUnit"
-    value = "workloads (ou-d48b-hqhocsae)"
+# 3. Enable Server-Side Encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
   }
+}
 
-  provisioning_parameters {
-    key   = "SSOUserEmail"
-    value = "shanthusvh@gmail.com"
-  }
+# 4. Block All Public Access (Enterprise Security Requirement)
+resource "aws_s3_bucket_public_access_block" "public_access" {
+  bucket                  = aws_s3_bucket.terraform_state.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
 
-  provisioning_parameters {
-    key   = "SSOUserFirstName"
-    value = "shanthu"
-  }
+# 5. DynamoDB for State Locking
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "sentinel-tf-state-lock"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
-  provisioning_parameters {
-    key   = "SSOUserLastName"
-    value = "m"
+  attribute {
+    name = "LockID"
+    type = "S"
   }
 }
