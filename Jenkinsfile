@@ -2,11 +2,15 @@ pipeline {
     agent {
         docker { 
             image 'hashicorp/terraform:latest' 
-            args '-u root:root'
+            // We added --network host to bypass the Docker bridge entirely
+            args '-u root:root --network host'
         }
     }
 
-    // Notice the environment block with hardcoded credentials is completely GONE!
+    environment {
+        // Terraform still needs to know which datacenter to talk to
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
 
     stages {
         stage('Code Checkout') {
