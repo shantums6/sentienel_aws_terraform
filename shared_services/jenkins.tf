@@ -52,6 +52,14 @@ resource "aws_instance" "jenkins_master" {
 
   # IMPORTANT: If you have an SSH Key Pair in AWS, uncomment the line below and add the name.
   key_name = "sentinel-jenkins-key"
+  # 🛡️ ADD THIS BLOCK TO PREVENT SELF-DESTRUCTION
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data
+    ]
+  }
+
 
   # Grab the profile name from the module output
   iam_instance_profile = module.jenkins_iam_role.instance_profile_name
