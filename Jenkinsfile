@@ -3,7 +3,7 @@ pipeline {
         docker { 
             image 'hashicorp/terraform:latest' 
             // We added --network host to bypass the Docker bridge entirely
-            args '-u root:root --network host'
+            args '-u root:root'
         }
     }
 
