@@ -5,6 +5,5 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "sentinel-tf-state-lock" # Your DynamoDB table name
     encrypt        = true
-    profile        = "shared-services"
   }
 }
