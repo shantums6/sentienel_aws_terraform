@@ -2,8 +2,8 @@ pipeline {
     agent {
         docker { 
             image 'hashicorp/terraform:latest' 
-            // We added --network host to bypass the Docker bridge entirely
-            args '-u root:root'
+            // Added --entrypoint='' to force Jenkins to take control
+            args '-u root:root --entrypoint='
         }
     }
 
