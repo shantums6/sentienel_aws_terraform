@@ -2,13 +2,11 @@ pipeline {
     agent {
         docker { 
             image 'hashicorp/terraform:latest' 
-            // Added --entrypoint='' to force Jenkins to take control
             args '-u root:root --entrypoint='
         }
     }
 
     environment {
-        // Terraform still needs to know which datacenter to talk to
         AWS_DEFAULT_REGION = 'us-east-1'
     }
 
@@ -31,6 +29,15 @@ pipeline {
             steps {
                 dir('shared_services') {
                     sh 'terraform plan'
+                }
+            }
+        }
+        
+        // 🚀 THE NEW STAGE: Build the infrastructure!
+        stage('Terraform Apply') {
+            steps {
+                dir('shared_services') {
+                    sh 'terraform apply -auto-approve'
                 }
             }
         }
