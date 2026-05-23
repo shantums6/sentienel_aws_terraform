@@ -32,8 +32,15 @@ pipeline {
                 }
             }
         }
+
+        // 🛑 THE ENTERPRISE GATE
+        stage('Approval') {
+            steps {
+                input message: "Review the Terraform Plan above. Do you approve this deployment to AWS?", ok: "Approve & Deploy"
+            }
+        }
         
-        // 🚀 THE NEW STAGE: Build the infrastructure!
+        // 🚀 THE LIVE DEPLOYMENT
         stage('Terraform Apply') {
             steps {
                 dir('shared_services') {
